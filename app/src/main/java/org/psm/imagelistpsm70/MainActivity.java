@@ -2,7 +2,6 @@ package org.psm.imagelistpsm70;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -14,6 +13,8 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -30,24 +31,19 @@ public class MainActivity extends AppCompatActivity {
         mImageView = (ImageView)findViewById(R.id.imageView);
 
         createRequestQueue();
-/*
-        if(TextUtils.isEmpty(mTMDbJson) == false){
-            mTextView.setText(mTMDbJson);
-        } else {
-            mTextView.setText("empty");
-        }*/
-
     }
 
     private void createRequestQueue(){
         // 요청 큐 초기화
         RequestQueue queue = Volley.newRequestQueue(this);
-        String apiUrl = "https://api.themoviedb.org/3/movie/550?api_key=79735f49c034458cf449afabd0e893a3";
-
+        // 요청 Url
+        String apiUrl = TMDbDefine.URL_HEAD + TMDbDefine.URL_MOVIE_NOWPLAYING + TMDbDefine.API_KEY;
+        // Json 요청 통신
         StringRequest stringRequest = new StringRequest(StringRequest.Method.GET, apiUrl,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+                        // 수신한 Json String
                         mTMDbJson = response;
                         jsonParsingFromGson();
                     }
@@ -64,10 +60,15 @@ public class MainActivity extends AppCompatActivity {
 
     private void jsonParsingFromGson(){
         Gson gson = new Gson();
-        TMDbObj obj = gson.fromJson(mTMDbJson, TMDbObj.class);
+        TMDbNowPlayingObj nowPlayingObj = gson.fromJson(mTMDbJson, TMDbNowPlayingObj.class);
 
-        String imageUrl = "http://image.tmdb.org/t/p/w500";
-        imageUrl = imageUrl + obj.getBackdrop_path();
+        ArrayList<TMDbNowPlayingObj.ResultsObj> resultsObjs = nowPlayingObj.getResults();
+
+/*        for(int i = 0; i < resultsObjs.size(); i++){
+
+        }*/
+        String imageUrlTail = resultsObjs.get(0).backdrop_path;
+        String imageUrl = TMDbDefine.IMAGE_LOAD_URL_HEAD + imageUrlTail;
         mTextView.setText(imageUrl);
         Glide.with(this).load(imageUrl).into(mImageView);
     }
