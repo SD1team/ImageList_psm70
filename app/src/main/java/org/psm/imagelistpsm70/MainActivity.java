@@ -2,7 +2,9 @@ package org.psm.imagelistpsm70;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
 
     TextView mTextView;
     ImageView mImageView;
+    ListView mListView;
     String mTMDbJson;
 
     @Override
@@ -29,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
 
         mTextView = (TextView)findViewById(R.id.textView);
         mImageView = (ImageView)findViewById(R.id.imageView);
+        mListView = (ListView)findViewById(R.id.listView);
 
         createRequestQueue();
     }
@@ -63,14 +67,16 @@ public class MainActivity extends AppCompatActivity {
         TMDbNowPlayingObj nowPlayingObj = gson.fromJson(mTMDbJson, TMDbNowPlayingObj.class);
 
         ArrayList<TMDbNowPlayingObj.ResultsObj> resultsObjs = nowPlayingObj.getResults();
+        // 이미지 url을 담을 ArrayList
+        ArrayList<String> imageUrlList = new ArrayList<>();
 
-/*        for(int i = 0; i < resultsObjs.size(); i++){
+        // 리스트 사이즈만큼 이미지 url을 담아낸다
+        for(int i = 0; i < resultsObjs.size(); i++){
+            imageUrlList.add(TMDbDefine.IMAGE_LOAD_URL_HEAD + resultsObjs.get(i).backdrop_path);
+        }
 
-        }*/
-        String imageUrlTail = resultsObjs.get(0).backdrop_path;
-        String imageUrl = TMDbDefine.IMAGE_LOAD_URL_HEAD + imageUrlTail;
-        mTextView.setText(imageUrl);
-        Glide.with(this).load(imageUrl).into(mImageView);
+        TMDbListAdapter listAdapter = new TMDbListAdapter(getApplicationContext(), imageUrlList);
+        mListView.setAdapter(listAdapter);
     }
 
 }
