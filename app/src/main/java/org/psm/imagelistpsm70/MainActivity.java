@@ -2,6 +2,7 @@ package org.psm.imagelistpsm70;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -41,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         // 요청 큐 초기화
         RequestQueue queue = Volley.newRequestQueue(this);
         // 요청 Url
-        String apiUrl = TMDbDefine.URL_HEAD + TMDbDefine.URL_MOVIE_NOWPLAYING + TMDbDefine.API_KEY;
+        String apiUrl = TMDbDefine.URL_HEAD + TMDbDefine.URL_PARAM_MOVIE_NOWPLAYING + TMDbDefine.URL_PARAM_API_KEY;
         // Json 요청 통신
         StringRequest stringRequest = new StringRequest(StringRequest.Method.GET, apiUrl,
                 new Response.Listener<String>() {
@@ -72,10 +73,14 @@ public class MainActivity extends AppCompatActivity {
 
         // 리스트 사이즈만큼 이미지 url을 담아낸다
         for(int i = 0; i < resultsObjs.size(); i++){
-            imageUrlList.add(TMDbDefine.IMAGE_LOAD_URL_HEAD + resultsObjs.get(i).backdrop_path);
+            String backdropPath = resultsObjs.get(i).backdrop_path;
+            if(TextUtils.isEmpty(backdropPath)){
+                continue;
+            }
+            imageUrlList.add(TMDbDefine.IMAGE_LOAD_URL_HEAD + backdropPath);
         }
 
-        TMDbListAdapter listAdapter = new TMDbListAdapter(getApplicationContext(), imageUrlList);
+        TMDbListAdapter listAdapter = new TMDbListAdapter(this, imageUrlList);
         mListView.setAdapter(listAdapter);
     }
 
