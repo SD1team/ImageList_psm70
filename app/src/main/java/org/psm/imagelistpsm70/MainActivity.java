@@ -27,12 +27,15 @@ public class MainActivity extends AppCompatActivity {
     ListView mListView;
     String mTMDbJson;
 
+    private static final String OPEN_SOURCE_TITLE = "Volley/Glide";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         // set ToolBar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolBar);
+        toolbar.setTitle(OPEN_SOURCE_TITLE);
         setSupportActionBar(toolbar);
 
         mTextView = (TextView)findViewById(R.id.textView);
