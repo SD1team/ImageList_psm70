@@ -71,9 +71,10 @@ public class MainActivity extends AppCompatActivity {
         // 이미지 url을 담을 ArrayList
         ArrayList<String> imageUrlList = new ArrayList<>();
 
+        String backdropPath = "";
         // 리스트 사이즈만큼 이미지 url을 담아낸다
         for(int i = 0; i < resultsObjs.size(); i++){
-            String backdropPath = resultsObjs.get(i).backdrop_path;
+            backdropPath = resultsObjs.get(i).backdrop_path;
             if(TextUtils.isEmpty(backdropPath)){
                 continue;
             }
