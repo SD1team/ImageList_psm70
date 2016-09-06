@@ -1,9 +1,12 @@
 package org.psm.imagelistpsm70;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -85,8 +88,25 @@ public class MainActivity extends AppCompatActivity {
             imageUrlList.add(TMDbDefine.IMAGE_LOAD_URL_HEAD + posterPath);
         }
 
-        TMDbListAdapter listAdapter = new TMDbListAdapter(this, imageUrlList);
+        TMDbListAdapter listAdapter = new TMDbListAdapter(MainActivity.this, imageUrlList);
         mListView.setAdapter(listAdapter);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                Intent intent = new Intent(MainActivity.this, CardActivity.class);
+                startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 }

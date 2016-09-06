@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -27,13 +28,13 @@ public class TMDbRecycleAdapter extends RecyclerView.Adapter<TMDbRecycleAdapter.
         }
     }
 
-    public TMDbRecycleAdapter (ArrayList<String> urlList) {
+    public TMDbRecycleAdapter (Context context, ArrayList<String> urlList) {
+        this.context = context;
         this.urlList = urlList;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        context = parent.getContext();
         View v = LayoutInflater.from(context).inflate(R.layout.tmdb_recycle_item, parent, false);
 
         ViewHolder vh = new ViewHolder(v);
@@ -44,7 +45,10 @@ public class TMDbRecycleAdapter extends RecyclerView.Adapter<TMDbRecycleAdapter.
     public void onBindViewHolder(ViewHolder holder, int position) {
         String imageUrl = urlList.get(position);
 
-        Glide.with(context).load(imageUrl).into(holder.mImageView);
+        //Glide.with(context).load(imageUrl).into(holder.mImageView);
+        Picasso.with(context).setIndicatorsEnabled(true);
+        Picasso.with(context).load(imageUrl).into(holder.mImageView);
+
     }
 
     @Override

@@ -25,7 +25,7 @@ public class CardActivity extends AppCompatActivity {
     private RecyclerView.LayoutManager mLayoutManager;
     String mTMDbJson;
 
-    private static final String TITLE = "Volley/Glide/RecycleView";
+    private static final String TITLE = "Volley/Picasso/RecycleView";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,7 +93,7 @@ public class CardActivity extends AppCompatActivity {
             imageUrlList.add(TMDbDefine.IMAGE_LOAD_URL_HEAD + posterPath);
         }
 
-        TMDbRecycleAdapter mAdapter = new TMDbRecycleAdapter(imageUrlList);
+        TMDbRecycleAdapter mAdapter = new TMDbRecycleAdapter(CardActivity.this, imageUrlList);
         mRecyclerView.setAdapter(mAdapter);
     }
 
