@@ -25,7 +25,7 @@ public class CardActivity extends AppCompatActivity {
     private RecyclerView.LayoutManager mLayoutManager;
     String mTMDbJson;
 
-    private static final String TITLE = "Volley/Glide/Card";
+    private static final String TITLE = "Volley/Glide/RecycleView";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

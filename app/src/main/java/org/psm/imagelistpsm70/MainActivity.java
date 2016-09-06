@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
     ListView mListView;
     String mTMDbJson;
 
-    private static final String TITLE = "Volley/Glide";
+    private static final String TITLE = "Volley/Glide/ListView";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
         String posterPath = "";
         // 리스트 사이즈만큼 이미지 url을 담아낸다
         for(int i = 0; i < resultsObjs.size(); i++){
-            posterPath = resultsObjs.get(i).backdrop_path;
+            posterPath = resultsObjs.get(i).poster_path;
             if(TextUtils.isEmpty(posterPath)){
                 continue;
             }
