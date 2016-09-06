@@ -48,7 +48,7 @@ public class TMDbListAdapter extends BaseAdapter {
         if(convertView == null){
             vh = new ViewHolder();
             LinearLayout llRow = (LinearLayout)LayoutInflater.from(context).inflate(R.layout.tmdb_list_item, parent, false);
-            vh.listImageView = (ImageView)llRow.findViewById(R.id.tmdbListItemImage);
+            vh.listImageView = (ImageView)llRow.findViewById(R.id.listItemImage);
 
             llRow.setTag(vh);
 

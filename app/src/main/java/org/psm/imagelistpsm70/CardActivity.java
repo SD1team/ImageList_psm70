@@ -1,13 +1,13 @@
 package org.psm.imagelistpsm70;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
@@ -15,31 +15,39 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class CardActivity extends AppCompatActivity {
 
-    ListView mListView;
+    private RecyclerView mRecyclerView;
+    private RecyclerView.LayoutManager mLayoutManager;
     String mTMDbJson;
 
-    private static final String TITLE = "Volley/Glide";
+    private static final String TITLE = "Volley/Glide/Card";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_card);
         // set ToolBar
-        View cardToolbar = (View)findViewById(R.id.mainToolBar);
+        View cardToolbar = (View)findViewById(R.id.cardToolBar);
         Toolbar toolbar = (Toolbar)cardToolbar.findViewById(R.id.customToolBar);
         toolbar.setTitle(TITLE);
-        setSupportActionBar(toolbar);;
+        setSupportActionBar(toolbar);
 
-        mListView = (ListView)findViewById(R.id.mainListView);
+        setRecycleView();
 
         createRequestQueue();
+    }
+
+    private void setRecycleView(){
+        mRecyclerView = (RecyclerView)findViewById(R.id.cardRecycleView);
+        mRecyclerView.setHasFixedSize(true);
+
+        mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
     }
 
     private void createRequestQueue(){
@@ -78,15 +86,15 @@ public class MainActivity extends AppCompatActivity {
         String posterPath = "";
         // 리스트 사이즈만큼 이미지 url을 담아낸다
         for(int i = 0; i < resultsObjs.size(); i++){
-            posterPath = resultsObjs.get(i).backdrop_path;
+            posterPath = resultsObjs.get(i).poster_path;
             if(TextUtils.isEmpty(posterPath)){
                 continue;
             }
             imageUrlList.add(TMDbDefine.IMAGE_LOAD_URL_HEAD + posterPath);
         }
 
-        TMDbListAdapter listAdapter = new TMDbListAdapter(this, imageUrlList);
-        mListView.setAdapter(listAdapter);
+        TMDbRecycleAdapter mAdapter = new TMDbRecycleAdapter(imageUrlList);
+        mRecyclerView.setAdapter(mAdapter);
     }
 
 }
