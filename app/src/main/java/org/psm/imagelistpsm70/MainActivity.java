@@ -22,8 +22,6 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    TextView mTextView;
-    ImageView mImageView;
     ListView mListView;
     String mTMDbJson;
 
@@ -38,8 +36,6 @@ public class MainActivity extends AppCompatActivity {
         toolbar.setTitle(OPEN_SOURCE_TITLE);
         setSupportActionBar(toolbar);
 
-        mTextView = (TextView)findViewById(R.id.textView);
-        mImageView = (ImageView)findViewById(R.id.imageView);
         mListView = (ListView)findViewById(R.id.listView);
 
         createRequestQueue();
