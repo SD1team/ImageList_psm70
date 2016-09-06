@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         View cardToolbar = (View)findViewById(R.id.mainToolBar);
         Toolbar toolbar = (Toolbar)cardToolbar.findViewById(R.id.customToolBar);
         toolbar.setTitle(TITLE);
-        setSupportActionBar(toolbar);;
+        setSupportActionBar(toolbar);
 
         mListView = (ListView)findViewById(R.id.mainListView);
 
