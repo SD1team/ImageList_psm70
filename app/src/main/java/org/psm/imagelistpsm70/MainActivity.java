@@ -1,6 +1,7 @@
 package org.psm.imagelistpsm70;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.FragmentActivity;
@@ -33,8 +34,6 @@ import java.util.ArrayList;
 
 public class MainActivity extends FragmentActivity implements View.OnClickListener{
 
-    ListView mListView;
-
     Button mGlideBtn, mPicassoBtn, mBothBtn;
 
     FrameLayout mGlideContainer;
@@ -43,10 +42,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     private GlideFragment mGlideFragment;
     private PicassoFragment mPicassoFragment;
 
-    private String mTMDbJson;
-
-    static final int REQUEST_SUCCESS = 0;
-
+    private SharedPreferences mSharedPreference;
     private int mState = STATE_GLIDE;
     static final int STATE_GLIDE = 0;
     static final int STATE_PICASSO = 1;
@@ -57,15 +53,20 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        setLayout();
+        // setting 가져오기
+        mSharedPreference = getSharedPreferences("pref", MODE_PRIVATE);
+        if(mSharedPreference != null){
+            mState = mSharedPreference.getInt("STATE_SETTING", STATE_GLIDE);
+        }
 
-        setFragment();
+        initLayout();
+
+        initFragment();
     }
 
-    public void setLayout(){
+    public void initLayout(){
         mGlideContainer = (FrameLayout)findViewById(R.id.glideFragmentContainer);
         mPicassoContainer = (FrameLayout)findViewById(R.id.picassoFragmentContainer);
-        mPicassoContainer.setVisibility(View.GONE);
 
         mGlideBtn = (Button)findViewById(R.id.glideButton);
         mPicassoBtn = (Button)findViewById(R.id.picassoButton);
@@ -76,17 +77,29 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         mBothBtn.setOnClickListener(this);
     }
 
-    public void setFragment(){
+    /**
+     * 설정에 따라 Fragment add
+     */
+    public void initFragment(){
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
         mGlideFragment = new GlideFragment();
         mPicassoFragment = new PicassoFragment();
 
-        fragmentTransaction.add(mGlideContainer.getId(), mGlideFragment);
-        //fragmentTransaction.add(mPicassoContainer.getId(), mPicassoFragment);
-
-        fragmentTransaction.commit();
+        switch (mState) {
+            case STATE_GLIDE :
+                fragmentTransaction.add(mGlideContainer.getId(), mGlideFragment).commit();
+                mPicassoContainer.setVisibility(View.GONE);
+                return;
+            case STATE_PICASSO :
+                fragmentTransaction.add(mPicassoContainer.getId(), mPicassoFragment).commit();
+                mGlideContainer.setVisibility(View.GONE);
+                return;
+            case STATE_BOTH :
+                fragmentTransaction.add(mGlideContainer.getId(), mGlideFragment);
+                fragmentTransaction.add(mPicassoContainer.getId(), mPicassoFragment).commit();
+        }
     }
 
     public void changeFragment(int state){
@@ -122,12 +135,15 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         switch (v.getId()) {
             case R.id.glideButton :
                 changeFragment(STATE_GLIDE);
+                mSharedPreference.edit().putInt("STATE_SETTING", STATE_GLIDE).commit();
                 return;
             case R.id.picassoButton :
                 changeFragment(STATE_PICASSO);
+                mSharedPreference.edit().putInt("STATE_SETTING", STATE_PICASSO).commit();
                 return;
             case R.id.bothButton :
                 changeFragment(STATE_BOTH);
+                mSharedPreference.edit().putInt("STATE_SETTING", STATE_BOTH).commit();
         }
     }
 
