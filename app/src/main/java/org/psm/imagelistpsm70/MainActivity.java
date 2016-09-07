@@ -1,6 +1,11 @@
 package org.psm.imagelistpsm70;
 
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Message;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -8,6 +13,8 @@ import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -20,102 +27,108 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends FragmentActivity implements View.OnClickListener{
 
     ListView mListView;
+
+    Button mGlideBtn, mPicassoBtn, mBothBtn;
+
+    FrameLayout mGlideContainer;
+    FrameLayout mPicassoContainer;
+
+    private GlideFragment mGlideFragment;
+    private PicassoFragment mPicassoFragment;
+
+    private String mTMDbJson;
+
+    static final int REQUEST_SUCCESS = 0;
+
+    private int mState = STATE_GLIDE;
+    static final int STATE_GLIDE = 0;
+    static final int STATE_PICASSO = 1;
+    static final int STATE_BOTH = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        // set ToolBar
-        View cardToolbar = (View)findViewById(R.id.mainToolBar);
-        Toolbar toolbar = (Toolbar)cardToolbar.findViewById(R.id.customToolBar);
-        setSupportActionBar(toolbar);
 
-        mListView = (ListView)findViewById(R.id.mainListView);
+        setLayout();
 
-        // request json string
-        requestJsonString();
+        setFragment();
     }
 
-    /**
-     * JsonString 요청 통신
-     *
-     * Volley 통신 순서
-     * 1. RequestQueue 생성
-     * 2. Request 생성
-     * 3. RequestQueue에 Request 추가
-     */
-    private void requestJsonString(){
-        // TMDb NowPlaying 요청 Url
-        String apiUrl = TMDbDefine.URL_HEAD + TMDbDefine.URL_PARAM_MOVIE_NOWPLAYING + TMDbDefine.URL_PARAM_API_KEY;
+    public void setLayout(){
+        mGlideContainer = (FrameLayout)findViewById(R.id.glideFragmentContainer);
+        mPicassoContainer = (FrameLayout)findViewById(R.id.picassoFragmentContainer);
+        mPicassoContainer.setVisibility(View.GONE);
 
-        // 1. RequestQueue 생성 > 싱글톤으로 된 MyVolleyRequest에는 RequestQueue가 존재
-        // 2. Request 생성 > addToRequestQueue의 파라미터에서 new StringRequest
-        // 3. RequestQueue에 Request 추가 > 통신 결과 리스너에서 이후 로직 시작
-        MyVolleyRequest.getInstance(this).addToRequestQueue(new StringRequest(StringRequest.Method.GET, apiUrl,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        // 수신한 json string parsing
-                        parseJsonFromGson(response);
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getApplicationContext(), "통신 실패!", Toast.LENGTH_SHORT).show();
-                    }
-                }));
+        mGlideBtn = (Button)findViewById(R.id.glideButton);
+        mPicassoBtn = (Button)findViewById(R.id.picassoButton);
+        mBothBtn = (Button)findViewById(R.id.bothButton);
+
+        mGlideBtn.setOnClickListener(this);
+        mPicassoBtn.setOnClickListener(this);
+        mBothBtn.setOnClickListener(this);
     }
 
-    /**
-     * 1. json parsing
-     * 2. image url list 생성
-     * 3. listView 세팅
-     * @param json 통신 결과 json
-     */
-    private void parseJsonFromGson(String json){
-        Gson gson = new Gson();
-        // TMDbNowPlayingObj - 모든 데이터를 담고있는 객체
-        TMDbNowPlayingObj nowPlayingObj = gson.fromJson(json, TMDbNowPlayingObj.class);
+    public void setFragment(){
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-        // ResultsObj - 영화 하나의 정보를 담고있는 객체
-        ArrayList<TMDbNowPlayingObj.ResultsObj> resultsObjs = nowPlayingObj.getResults();
+        mGlideFragment = new GlideFragment();
+        mPicassoFragment = new PicassoFragment();
 
-        // image url list 생성
-        ArrayList<String> imageUrlList = makeImageList(resultsObjs);
+        fragmentTransaction.add(mGlideContainer.getId(), mGlideFragment);
+        //fragmentTransaction.add(mPicassoContainer.getId(), mPicassoFragment);
 
-        // 이미지 보여줄 리스트뷰 세팅
-        TMDbListAdapter listAdapter = new TMDbListAdapter(MainActivity.this, imageUrlList);
-        mListView.setAdapter(listAdapter);
+        fragmentTransaction.commit();
     }
 
-    /**
-     * 요청 결과 데이터 중에서, image url만 추출하여 리스트로 생성
-     * @param resultsList 영화 정보들이 담긴 obj list
-     * @return image url만 담긴 list
-     */
-    private ArrayList<String> makeImageList(ArrayList<TMDbNowPlayingObj.ResultsObj> resultsList) {
+    public void changeFragment(int state){
+        mState = state;
 
-        // 이미지 url을 담을 ArrayList
-        ArrayList<String> imagelist = new ArrayList<>();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-        String posterPath = "";
-        // 리스트 사이즈만큼 이미지 url을 담아낸다
-        for(int i = 0; i < resultsList.size(); i++){
-            posterPath = resultsList.get(i).poster_path;
-            if(TextUtils.isEmpty(posterPath)){
-                continue;
-            }
-            imagelist.add(TMDbDefine.IMAGE_LOAD_URL_HEAD + posterPath);
+        switch (mState){
+            case STATE_GLIDE :
+                fragmentTransaction.replace(mGlideContainer.getId(), mGlideFragment);
+                fragmentTransaction.remove(mPicassoFragment).commit();
+                mGlideContainer.setVisibility(View.VISIBLE);
+                mPicassoContainer.setVisibility(View.GONE);
+                return;
+            case STATE_PICASSO :
+                fragmentTransaction.replace(mPicassoContainer.getId(), mPicassoFragment);
+                fragmentTransaction.remove(mGlideFragment).commit();
+                mPicassoContainer.setVisibility(View.VISIBLE);
+                mGlideContainer.setVisibility(View.GONE);
+                return;
+            case STATE_BOTH :
+                fragmentTransaction.replace(mGlideContainer.getId(), mGlideFragment);
+                fragmentTransaction.replace(mPicassoContainer.getId(), mPicassoFragment);
+                fragmentTransaction.commit();
+                mGlideContainer.setVisibility(View.VISIBLE);
+                mPicassoContainer.setVisibility(View.VISIBLE);
         }
+    }
 
-        return imagelist;
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.glideButton :
+                changeFragment(STATE_GLIDE);
+                return;
+            case R.id.picassoButton :
+                changeFragment(STATE_PICASSO);
+                return;
+            case R.id.bothButton :
+                changeFragment(STATE_BOTH);
+        }
     }
 
     @Override
@@ -128,8 +141,6 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_settings:
-                Intent intent = new Intent(MainActivity.this, CardActivity.class);
-                startActivity(intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

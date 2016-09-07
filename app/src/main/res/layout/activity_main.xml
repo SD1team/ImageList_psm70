@@ -6,6 +6,7 @@
     tools:context="org.psm.imagelistpsm70.MainActivity">
 
     <!-- ToolBar -->
+    <!--
     <include
         android:id="@+id/mainToolBar"
         android:layout_width="match_parent"
@@ -13,21 +14,57 @@
         layout="@layout/toolbar"
         android:layout_marginBottom="@dimen/activity_vertical_margin"
         android:layout_alignParentTop="true"/>
+        -->
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/mainContentsLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:layout_below="@+id/mainToolBar">
+        android:orientation="vertical">
 
-        <ListView
-            android:id="@+id/mainListView"
+        <LinearLayout
+            android:id="@+id/buttonSet"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentTop="true"/>
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
-    </RelativeLayout>
+            <Button
+                android:id="@+id/glideButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Glide"/>
+
+            <Button
+                android:id="@+id/picassoButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="PICASSO"/>
+
+            <Button
+                android:id="@+id/bothButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="BOTH"/>
+
+        </LinearLayout>
+
+
+        <FrameLayout
+            android:id="@+id/glideFragmentContainer"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+        <FrameLayout
+            android:id="@+id/picassoFragmentContainer"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
 
 </RelativeLayout>
