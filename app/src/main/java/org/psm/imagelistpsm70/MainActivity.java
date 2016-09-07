@@ -26,9 +26,6 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
 
     ListView mListView;
-    String mTMDbJson;
-
-    private static final String TITLE = "Volley/Glide/ListView";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,27 +34,35 @@ public class MainActivity extends AppCompatActivity {
         // set ToolBar
         View cardToolbar = (View)findViewById(R.id.mainToolBar);
         Toolbar toolbar = (Toolbar)cardToolbar.findViewById(R.id.customToolBar);
-        toolbar.setTitle(TITLE);
         setSupportActionBar(toolbar);
 
         mListView = (ListView)findViewById(R.id.mainListView);
 
-        createRequestQueue();
+        // request json string
+        requestJsonString();
     }
 
-    private void createRequestQueue(){
-        // 요청 큐 초기화
-        RequestQueue queue = Volley.newRequestQueue(this);
-        // 요청 Url
+    /**
+     * JsonString 요청 통신
+     *
+     * Volley 통신 순서
+     * 1. RequestQueue 생성
+     * 2. Request 생성
+     * 3. RequestQueue에 Request 추가
+     */
+    private void requestJsonString(){
+        // TMDb NowPlaying 요청 Url
         String apiUrl = TMDbDefine.URL_HEAD + TMDbDefine.URL_PARAM_MOVIE_NOWPLAYING + TMDbDefine.URL_PARAM_API_KEY;
-        // Json 요청 통신
-        StringRequest stringRequest = new StringRequest(StringRequest.Method.GET, apiUrl,
+
+        // 1. RequestQueue 생성 > 싱글톤으로 된 MyVolleyRequest에는 RequestQueue가 존재
+        // 2. Request 생성 > addToRequestQueue의 파라미터에서 new StringRequest
+        // 3. RequestQueue에 Request 추가 > 통신 결과 리스너에서 이후 로직 시작
+        MyVolleyRequest.getInstance(this).addToRequestQueue(new StringRequest(StringRequest.Method.GET, apiUrl,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        // 수신한 Json String
-                        mTMDbJson = response;
-                        jsonParsingFromGson();
+                        // 수신한 json string parsing
+                        parseJsonFromGson(response);
                     }
                 },
                 new Response.ErrorListener() {
@@ -65,31 +70,52 @@ public class MainActivity extends AppCompatActivity {
                     public void onErrorResponse(VolleyError error) {
                         Toast.makeText(getApplicationContext(), "통신 실패!", Toast.LENGTH_SHORT).show();
                     }
-                });
-
-        queue.add(stringRequest);
+                }));
     }
 
-    private void jsonParsingFromGson(){
+    /**
+     * 1. json parsing
+     * 2. image url list 생성
+     * 3. listView 세팅
+     * @param json 통신 결과 json
+     */
+    private void parseJsonFromGson(String json){
         Gson gson = new Gson();
-        TMDbNowPlayingObj nowPlayingObj = gson.fromJson(mTMDbJson, TMDbNowPlayingObj.class);
+        // TMDbNowPlayingObj - 모든 데이터를 담고있는 객체
+        TMDbNowPlayingObj nowPlayingObj = gson.fromJson(json, TMDbNowPlayingObj.class);
 
+        // ResultsObj - 영화 하나의 정보를 담고있는 객체
         ArrayList<TMDbNowPlayingObj.ResultsObj> resultsObjs = nowPlayingObj.getResults();
+
+        // image url list 생성
+        ArrayList<String> imageUrlList = makeImageList(resultsObjs);
+
+        // 이미지 보여줄 리스트뷰 세팅
+        TMDbListAdapter listAdapter = new TMDbListAdapter(MainActivity.this, imageUrlList);
+        mListView.setAdapter(listAdapter);
+    }
+
+    /**
+     * 요청 결과 데이터 중에서, image url만 추출하여 리스트로 생성
+     * @param resultsList 영화 정보들이 담긴 obj list
+     * @return image url만 담긴 list
+     */
+    private ArrayList<String> makeImageList(ArrayList<TMDbNowPlayingObj.ResultsObj> resultsList) {
+
         // 이미지 url을 담을 ArrayList
-        ArrayList<String> imageUrlList = new ArrayList<>();
+        ArrayList<String> imagelist = new ArrayList<>();
 
         String posterPath = "";
         // 리스트 사이즈만큼 이미지 url을 담아낸다
-        for(int i = 0; i < resultsObjs.size(); i++){
-            posterPath = resultsObjs.get(i).poster_path;
+        for(int i = 0; i < resultsList.size(); i++){
+            posterPath = resultsList.get(i).poster_path;
             if(TextUtils.isEmpty(posterPath)){
                 continue;
             }
-            imageUrlList.add(TMDbDefine.IMAGE_LOAD_URL_HEAD + posterPath);
+            imagelist.add(TMDbDefine.IMAGE_LOAD_URL_HEAD + posterPath);
         }
 
-        TMDbListAdapter listAdapter = new TMDbListAdapter(MainActivity.this, imageUrlList);
-        mListView.setAdapter(listAdapter);
+        return imagelist;
     }
 
     @Override
