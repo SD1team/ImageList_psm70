@@ -3,7 +3,13 @@
 
     <!-- 메뉴 추가 -->
     <item
-        android:id="@+id/action_settings"
-        android:title="@string/action_settings"/>
+        android:id="@+id/glide_settings"
+        android:title="@string/glide_settings"/>
+    <item
+        android:id="@+id/picasso_settings"
+        android:title="@string/picasso_settings"/>
+    <item
+        android:id="@+id/both_settings"
+        android:title="@string/both_settings"/>
 
 </menu>

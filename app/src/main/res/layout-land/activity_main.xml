@@ -21,18 +21,18 @@
         android:layout_below="@+id/mainToolBar"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:orientation="vertical">
+        android:orientation="horizontal">
 
         <FrameLayout
             android:id="@+id/glideFragmentContainer"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_marginBottom="4dp"
             android:layout_weight="1" /> <!-- 둘 다 보일 때 divider margin -->
         <FrameLayout
             android:id="@+id/picassoFragmentContainer"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1" />
 
     </LinearLayout>

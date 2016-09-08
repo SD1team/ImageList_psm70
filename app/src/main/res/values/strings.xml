@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">ImageListPsm70</string>
 
-    <string name="action_settings">Call CardView</string>
+    <string name="glide_settings">Glide</string>
+    <string name="picasso_settings">Picasso</string>
+    <string name="both_settings">Both</string>
 </resources>
