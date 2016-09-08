@@ -107,7 +107,7 @@ public class PicassoFragment extends Fragment {
         String posterPath = "";
         // 리스트 사이즈만큼 이미지 url을 담아낸다
         for(int i = 0; i < resultsList.size(); i++){
-            posterPath = resultsList.get(i).poster_path;
+            posterPath = resultsList.get(i).getPoster_path();
             if(TextUtils.isEmpty(posterPath)){
                 continue;
             }

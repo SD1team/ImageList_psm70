@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:id="@+id/recycleItemLayout"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:paddingTop="8dp"
+    android:layout_height="400dp"
+    android:gravity="center"
+    android:orientation="vertical"
     android:paddingBottom="8dp"
-    android:gravity="center">
+    android:paddingTop="8dp">
 
     <android.support.v7.widget.CardView
         android:id="@+id/recycleItemCard"
-        android:layout_gravity="center"
         android:layout_width="match_parent"
-        android:layout_height="400dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
         app:cardCornerRadius="4dp">
 
         <ImageView

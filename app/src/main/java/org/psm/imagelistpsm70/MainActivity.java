@@ -1,37 +1,17 @@
 package org.psm.imagelistpsm70;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-import com.bumptech.glide.Glide;
-import com.google.gson.Gson;
-import com.squareup.picasso.Picasso;
-
-import java.util.ArrayList;
-
 public class MainActivity extends FragmentActivity implements View.OnClickListener{
 
     Button mGlideBtn, mPicassoBtn, mBothBtn;
@@ -52,6 +32,9 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        View v = findViewById(R.id.mainToolBar);
+        Toolbar toolbar = (Toolbar)v.findViewById(R.id.customToolBar);
+        //setSupportActionBar(toolbar);
 
         // setting 가져오기
         mSharedPreference = getSharedPreferences("pref", MODE_PRIVATE);
