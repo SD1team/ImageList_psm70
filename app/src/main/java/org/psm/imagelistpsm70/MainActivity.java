@@ -1,19 +1,21 @@
 package org.psm.imagelistpsm70;
 
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.FrameLayout;
+
+/**
+ * 1. MainActivity 에서는 Fragment add,remove,replace만 담당
+ * 2. 통신(Volley), json파싱(Gson), 이미지로드(Glide/Picasso)
+ *    작업은 각각의 Fragment에서 담당
+ */
 public class MainActivity extends AppCompatActivity{
 
     FrameLayout mGlideContainer;
@@ -22,8 +24,10 @@ public class MainActivity extends AppCompatActivity{
     private GlideFragment mGlideFragment;
     private PicassoFragment mPicassoFragment;
 
-    private SharedPreferences mSharedPreference;
-    private int mState = STATE_GLIDE;
+    private SharedPreferences mSharedPreference; // 사용자가 선택한 설정 유지
+
+    // 현재 보여지고 있는 프래그먼트의 상태 및 상태값
+    private int mState;
     static final int STATE_GLIDE = 0;
     static final int STATE_PICASSO = 1;
     static final int STATE_BOTH = 2;
@@ -47,13 +51,21 @@ public class MainActivity extends AppCompatActivity{
         mGlideContainer = (FrameLayout)findViewById(R.id.glideFragmentContainer);
         mPicassoContainer = (FrameLayout)findViewById(R.id.picassoFragmentContainer);
 
-        initFragment();
+        if(savedInstanceState == null){
+            // 처음 add
+            initFragment(true);
+        } else {
+            // 가로/세로 변경 시 replace
+            initFragment(false);
+        }
     }
 
     /**
-     * 설정에 따라 Fragment add
+     * 1. 초기 init - fragment add
+     * 2. 가로/세로 변경 시 - fragment replace
+     * @param isFirst
      */
-    public void initFragment(){
+    public void initFragment(boolean isFirst){
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
@@ -62,24 +74,37 @@ public class MainActivity extends AppCompatActivity{
 
         switch (mState) {
             case STATE_GLIDE :
-                fragmentTransaction.add(mGlideContainer.getId(), mGlideFragment);
+                if(isFirst) {
+                    fragmentTransaction.add(mGlideContainer.getId(), mGlideFragment);
+                } else {
+                    fragmentTransaction.replace(mGlideContainer.getId(), mGlideFragment);
+                }
                 fragmentTransaction.commit();
                 mPicassoContainer.setVisibility(View.GONE);
                 return;
             case STATE_PICASSO :
-                fragmentTransaction.add(mPicassoContainer.getId(), mPicassoFragment);
+                if(isFirst) {
+                    fragmentTransaction.add(mPicassoContainer.getId(), mPicassoFragment);
+                } else {
+                    fragmentTransaction.replace(mPicassoContainer.getId(), mPicassoFragment);
+                }
                 fragmentTransaction.commit();
                 mGlideContainer.setVisibility(View.GONE);
                 return;
             case STATE_BOTH :
-                fragmentTransaction.add(mGlideContainer.getId(), mGlideFragment);
-                fragmentTransaction.add(mPicassoContainer.getId(), mPicassoFragment);
+                if(isFirst) {
+                    fragmentTransaction.add(mGlideContainer.getId(), mGlideFragment);
+                    fragmentTransaction.add(mPicassoContainer.getId(), mPicassoFragment);
+                } else {
+                    fragmentTransaction.replace(mGlideContainer.getId(), mGlideFragment);
+                    fragmentTransaction.replace(mPicassoContainer.getId(), mPicassoFragment);
+                }
                 fragmentTransaction.commit();
         }
     }
 
     /**
-     * 상태값에 따라 Fragment replace
+     * 상태값에 따라 Fragment replace를 담당
      * @param state
      */
     public void changeFragment(int state){
@@ -119,6 +144,9 @@ public class MainActivity extends AppCompatActivity{
         return true;
     }
 
+    /**
+     * 선택한 메뉴에 따라서 프래그먼트 변경하도록
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
