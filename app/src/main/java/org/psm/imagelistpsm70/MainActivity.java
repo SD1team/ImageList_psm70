@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity{
         // 사용자가 선택한 list setting 유지
         mSharedPreference = getSharedPreferences("pref", MODE_PRIVATE);
         if(mSharedPreference != null){
-            mState = mSharedPreference.getInt("STATE_SETTING", STATE_BOTH);
+            mState = mSharedPreference.getInt("STATE_SETTING", STATE_GLIDE); // 실행 시 모드
         }
 
         // init fragment container layout
